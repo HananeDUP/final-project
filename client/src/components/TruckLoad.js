@@ -35,14 +35,14 @@ class TruckLoad extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            statusRegister: false,
-            arrivee: this.props.data.date, numeroCamion: this.props.data.numerocamion, navire: this.props.data.navire,
-            importateur: this.props.data.importateur, produit: this.props.data.produit,
+            statusRegister: false, arrivee: this.props.data.date, numeroCamion: this.props.data.numerocamion,
+            navire: this.props.data.navire,importateur: this.props.data.importateur, produit: this.props.data.produit,
             destinataire: this.props.data.destinataire, quantiteEstimee: '',
             quantiteBl: this.props.data.quantite_bl, quantiteBlRestante: this.props.data.quantite_bl_restante,
             quantiteBLEstimee: this.props.data.quantite_bl_estimee,
             numeroDumAffecte: this.props.data.numero_dum_affecte, bon: '', tare: '', poidsBrut: '', statusCamion: 'Pas encore commencé',
-            statusCamionList: ['Arrivé', 'Pointé', 'Chargé', 'Sorti'],dataCurrentTruckStatus:{}
+            statusCamionList: ['Arrivé', 'Pointé', 'Chargé', 'Sorti'], dataCurrentTruckStatus: {},
+            workflowStatusRegister: ''
         }
     }
     handleChange(e) {
@@ -70,48 +70,74 @@ class TruckLoad extends Component {
 
         axios.post('http://localhost:5000/workflow/register', { arrivee, navire, importateur, produit, destinataire, numero_camion, bon, tare, quantite_estimee, poids_brut, camion_status, quantite_bl, quantite_bl_restante, quantite_bl_rest_estimee })
             .then(response => {
-                console.log('1-juste avant getCurrentCamSt response.data', response.data)
-                return new Promise((resolve, reject) => this.getCurrentCamionStatus(resolve, reject))
+                console.log('1-juste avant getCurrentCamSt response.data CURRENT', response.data)
+                console.log('My Context',this);
+                // this.setState({ workflowStatusRegister: response.data.status },()=>this.getCurrentData.bind(this))
+                this.setState({ workflowStatusRegister: response.data.status })
+                console.log('2-this.state.workflowStatusRegister',this.state.workflowStatusRegister)
+                // this.setState({statusRegister: true})
+
+                // this.setState({
+                //     statusRegister: true,
+                //     arrivee: '', numeroCamion: '', navire: '',
+                //     importateur: '', produit: '', destinataire: '', quantiteEstimee: '',
+                //     quantiteBl: '', quantiteBlRestante: '',
+                //     quantiteBLEstimee: '', numeroDumAffecte: '', bon: '', tare: '', poidsBrut: '', statusCamion: '',
+                //     statusCamionList: ['Arrivé', 'Pointé', 'Chargé', 'Sorti']
+                // })
+
+                // return new Promise((resolve, reject) => this.getCurrentCamionStatus(resolve, reject))
             })
-            .then(() => {
-                console.log('5-juste après getCurrentCamSt')
-                this.setState({
-                    statusRegister: true,
-                    arrivee: '', numeroCamion: '', navire: '',
-                    importateur: '', produit: '', destinataire: '', quantiteEstimee: '',
-                    quantiteBl: '', quantiteBlRestante: '',
-                    quantiteBLEstimee: '', numeroDumAffecte: '', bon: '', tare: '', poidsBrut: '', statusCamion: '',
-                    statusCamionList: ['Arrivé', 'Pointé', 'Chargé', 'Sorti']
-                },()=> console.log('6-juste après le setState est le status de page',this.state.statusRegister))
-            })
+            // .then(()=> {
+            //     console.log('5-juste après getCurrentCamSt')
+            //    return null
+            // })
             .catch(err => console.log(err))
     }
 
-    getCurrentCamionStatus(resolve, reject) {
-        const arrivee = this.state.arrivee
-        const navire = this.state.navire
-        const importateur = this.state.importateur
-        const produit = this.state.produit
-        const destinataire = this.state.destinataire
-        console.log('2-dans getCurrentCamSt', arrivee, navire, importateur, produit, destinataire)
-        axios.post('http://localhost:5000/workflow/data', { arrivee, navire, importateur, produit, destinataire})
-        .then(response => {
-            console.log('3-after workflow register', response.data)
-            this.setState({dataCurrentTruckStatus:response.data.data},()=>this.props.getCurrentTruckStatus(response.data.data, resolve))
-        })
-        .catch(err=>{
-            console.log('client side error',err)
-            reject()
-        })
-        console.log('4-data to send to TruckLoadResumee',this.state.dataCurrentTruckStatus)
-        
+    getCurrentData(){
+        let arraydata = {
+            date: this.state.arrivee,
+            navire: this.state.navire,
+            importateur: this.state.importateur,
+            produit: this.state.produit,
+            destinataire: this.state.destinataire
+        }
+        console.log('data to send to truckLoadResumee', arraydata)
+        this.props.gettruckStartLoadResumee(arraydata)
     }
 
+    // getCurrentCamionStatus(resolve, reject) {
+    //     const arrivee = this.state.arrivee
+    //     const navire = this.state.navire
+    //     const importateur = this.state.importateur
+    //     const produit = this.state.produit
+    //     const destinataire = this.state.destinataire
+    //     console.log('2-dans getCurrentCamSt', arrivee, navire, importateur, produit, destinataire)
+
+    //     console.log('2-bis-dans getCurrentCamSt', this.state.statusRegister)
+    //     axios.post('http://localhost:5000/workflow/data', { arrivee, navire, importateur, produit, destinataire })
+    //         .then(response => {
+    //             console.log('3-after workflow register', response.data)
+    //             this.setState({ dataCurrentTruckStatus: response.data.data }, () => {
+    //                 console.log('3-bis dataCurrentTruckStatus',this.state.dataCurrentTruckStatus)
+    //                 this.props.getCurrentTruckStatus(response.data.data, resolve)
+    //             })
+    //         })
+    //         .catch(err => {
+    //             console.log('client side error', err)
+    //             reject()
+    //         })
+    //     console.log('4-data to send to TruckLoadResumee', this.state.dataCurrentTruckStatus)
+
+    // }
+
     render() {
-        if (!this.state.statusRegister) {
+        // if (!this.state.statusRegister) {
+            if (this.state.workflowStatusRegister === "") {
             return (
                 <div className="truck-load-container">
-                <RecapData data={this.props.data}></RecapData>
+                    <RecapData data={this.props.data}></RecapData>
                     {/* <h1>Workflow de chargement:</h1>
                     <div>Camion numéro: <span className='numero-camion'>{this.props.data.numerocamion}</span></div>
                     <div className="truck-load-container1">
@@ -200,10 +226,16 @@ class TruckLoad extends Component {
                 </div >
             )
         } else {
-            return <Redirect push to="/truck-load-resumee"></Redirect>
-            
+            if (this.state.workflowStatusRegister === 'ok') {
+                return <Redirect push to="/truck-load-resumee"></Redirect>
+            } else if (this.state.workflowStatusRegister === 'data already inserted') {
+                return <div className='red'>Data already inserted</div>
+            }
         }
+
+
     }
 }
+
 
 export default TruckLoad

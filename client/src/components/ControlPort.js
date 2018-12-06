@@ -2,10 +2,17 @@ import React, { Component } from "react";
 import axios from 'axios';
 import { DataTable } from 'react-data-components';
 import { Redirect } from "react-router-dom";
+// import { isNull } from "util";
 // import { timingSafeEqual } from "crypto";
 
 
 class CamionDataTable extends Component {
+    // constructor(props){
+    //     super(props);
+    //     this.state={allData:this.props.data,classButtonName:'button is-primary',eventButton:'Commencer chargement"'}
+    //     // this.getStatus()
+    // }
+
 
     render() {
         const clickData = (e) => {
@@ -14,17 +21,28 @@ class CamionDataTable extends Component {
             // this.props.numero_camion
             // return numero_camion
         }
-
+        // const getStatus=()=>{
+        //     console.log('this.state.allData.camion_status',this.props.data.numero_camion)
+        //     if (this.state.allData.camion_status === null) {
+        //         this.setState({classButtonName:"button is-primary",eventButton:"Commencer chargement"})
+        //     } else if (this.state.allData.camion_status  === 'Validé') {
+        //         this.setState({classButtonName:"button is-danger",eventButton:"Terminé"})
+        //     }else {
+        //         this.setState({classButtonName:"button is-info",eventButton:"Continué"})
+        //     }
+        // }
         const columns = [
             { title: 'Numero Camion', prop: 'numero_camion', width: '30%' },
+            { title: 'Status Camion', prop: 'camion_status', width: '30%' },
             // { title: 'START LOAD', prop: 'start-control', defaultContent: (<button onClick={this.props.clickCamionStart}>Action</button>) }
-            { title: 'ACTION', prop: 'start-control', defaultContent: (<button className="button is-success" style={{ fontSize: '1em' }} onClick={clickData}>START LOAD</button>) }
+            { title: 'Action', prop: 'start-control', defaultContent: (<button className="button is-primary" style={{ fontSize: '1em' }} onClick={clickData}>ACTION</button>) }
         ];
         return (
             <DataTable
                 keys='numero_camion'
                 columns={columns}
                 initialData={this.props.data}
+                thi
                 initialPageLength={5}
                 justifyContent='center'
 
@@ -43,9 +61,11 @@ class DumDataTable extends Component {
             }
         }
         const columns = [
-            { title: 'Numero Dum', prop: 'numero_dum', className: getStatus },
-            { title: 'Quantité Dum', prop: 'quantite_dum', className: getStatus },
+            // { title: 'Numero Dum', prop: 'numero_dum', className: getStatus },
+            { title: 'Numero Dum', prop: 'numero_dum', className: this.props.statusDum },
+            { title: 'Quantité Dum', prop: 'quantite_dum', className: this.props.statusDum  },
             { title: 'Quantité Dum Restante', prop: 'quantite_dum_restante', className: getStatus },
+            { title: 'Quantité Dum Rest Estimée', prop: 'quantite_dum_rest_estimee', className: getStatus },
             { title: 'Status', prop: 'status', className: getStatus, width: '10%' },
 
             // { title: 'START LOAD', prop: 'start-control', defaultContent: (<button onClick={this.props.clickDetails}>Action</button>) }
@@ -72,7 +92,8 @@ class ControlPort extends Component {
             importateurList: [], destinataireList: [], produitList: [], portchrgmtList: [], portdechrgmtList: [],
             siloList: [], camionList: [], dumList: [], dumListAlive: [], numeroDum: '', numeroDumList: [],
             quantiteBL: '', quantiteBLRestante: '', quantiteBLEstimee: '', classNameQtyBL: '',
-            quantiteDum: '', quantiteDumList: [], quantiteDumRestante: '', quantiteDumRestanteList: [], quantiteDumEstimee: [],
+            quantiteDum: '', quantiteDumList: [], quantiteDumRestante: '', quantiteDumRestanteList: [], 
+            quantiteDumRestEstimee: '',quantiteDumRestEstimeeList: [], 
             statusDum: '', messageDum: false, displayLoad: false
         }
         this.getLastDate()
@@ -96,7 +117,10 @@ class ControlPort extends Component {
     getCamionList() {
         const destinataire = this.state.destinataire
         const produit = this.state.produit
-        axios.post("http://localhost:5000/api/camion_list_by_dest", { destinataire, produit })
+        const date_arrivee=this.state.arrivee
+        const navire=this.state.navire
+        const importateur=this.state.importateur
+        axios.post("http://localhost:5000/api/camion_list_by_dest", { destinataire, produit,date_arrivee,navire,importateur })
             .then(response => {
                 // let newarray = response.data.map(elem => elem.numero_camion)
                 console.log('list camion', response.data.data)
@@ -127,7 +151,13 @@ class ControlPort extends Component {
                 console.log('DUm data avant la condition', response.data.dataset)
                 if (response.data.dataset.length === 0) {
 
-                    this.setState({ messageDum: true })
+                    this.setState({ messageDum: true,
+                        dumList: [], dumListAlive: [], numeroDum: '', numeroDumList: [],
+                        quantiteBL: '', quantiteBLRestante: '', quantiteBLEstimee: '', classNameQtyBL: '',
+                        quantiteDum: '', quantiteDumList: [], quantiteDumRestante: '', quantiteDumRestanteList: [], 
+                        quantiteDumRestEstimee: '',quantiteDumRestEstimeeList: [], 
+                        statusDum: ''
+                     })
                 } else {
 
                     console.log('data dum', response.data.dataset)
@@ -135,12 +165,15 @@ class ControlPort extends Component {
                     let listNumeroDum = dumListNotfinished.map(elem => elem.numero_dum)
                     let quantiteDumAlive = dumListNotfinished.map(elem => elem.quantite_dum)
                     let quantiteDumRestanteAlive = dumListNotfinished.map(elem => elem.quantite_dum_restante)
+                    let quantiteDumRestEstAlive = dumListNotfinished.map(elem => elem.quantite_dum_rest_estimee)
                     console.log('dumListNotfinished', dumListNotfinished, 'quantiteDumAlive', quantiteDumAlive)
                     this.setState({
                         dumList: response.data.dataset, dumListAlive: dumListNotfinished,
                         numeroDum: listNumeroDum[0], numeroDumList: listNumeroDum, quantiteDum: quantiteDumAlive[0],
                         quantiteDumList: quantiteDumAlive, quantiteDumRestante: quantiteDumRestanteAlive[0],
-                        quantiteDumRestanteList: quantiteDumRestanteAlive, messageDum: false
+                        quantiteDumRestanteList: quantiteDumRestanteAlive, quantiteDumRestEstimee: quantiteDumRestEstAlive[0],
+                        quantiteDumRestEstimeeList: quantiteDumRestEstAlive, 
+                        messageDum: false
                     }, () => {
                         this.getClassNameDumStatus()
                     }
@@ -250,7 +283,7 @@ class ControlPort extends Component {
             quantite_bl_estimee: this.state.quantiteBLEstimee,
             quantite_dum: this.state.quantiteDum,
             quantite_dum_restante: this.state.quantiteDumRestante,
-            quantite_dum_estimee: this.state.quantiteDumEstimee,
+            quantite_dum_estimee: this.state.quantiteDumRestEstimee,
             numero_dum_affecte: this.state.numeroDum,
         }
         console.log('data to send to truckLoad', arraydata)
@@ -466,7 +499,7 @@ class ControlPort extends Component {
                         <label className="label">DUM information:</label>
                         {/* <div className='dataTable' > */}
                         <div className='table-show'>
-                            <DumDataTable data={this.state.dumList} ></DumDataTable>
+                            <DumDataTable data={this.state.dumList} statusDum={this.state.statusDum} ></DumDataTable>
                         </div>
                     </div>
                 </div>

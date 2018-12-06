@@ -106,24 +106,71 @@ router.post('/data_by_date', (req, res, next) => {
             res.json({ data })
         })
         .catch(err => res.json({ status: err }))
-
 })
 
 router.post('/camion_list_by_dest',(req,res,next)=>{
     const destinataire=req.body.destinataire
     const produit=req.body.produit
-    console.log('destin est ',destinataire)
-    console.log('produ est ',produit)
+    const datearrivee=req.body.date_arrivee
+    const navire=req.body.navire
+    const importateur=req.body.importateur
+    console.log('destinataire est ',destinataire)
+    console.log('produit',produit,'navire',navire,'date arrivée',datearrivee,'importateur',importateur)
     db('camion')
     .innerJoin('destinataire', 'camion.destinataire_id', '=', 'destinataire.id')
     .innerJoin('produit', 'camion.produit_id', '=', 'produit.id')
-    .select('numero_camion') 
+    // .leftOuterJoin('chargement_camion','chargement_camion.numero_camion','=','camion.numero_camion')
+    .leftOuterJoin('chargement_camion', function() {
+        this.on('chargement_camion.numero_camion','=','camion.numero_camion').onBetween('chargement_camion.date_arrivee',[datearrivee,datearrivee])
+      })
+    .distinct()
+    .select('camion.numero_camion','camion_status') 
     .where({
         'destinataire.nom':destinataire,
         'produit.nom':produit
+        // 'date_arrivee':datearrivee
     })
     .then(data=>{
-        console.log("data camion", data)
+        console.log("1 data camion", data)
+        // let newarray_camion=data.map(elem=>elem.numero_camion)
+        // db('chargement_camion')
+        // .innerJoin('navire', 'chargement_camion.navire_id', '=', 'navire.id')
+        // .innerJoin('importateur', 'chargement_camion.importateur_id', '=', 'importateur.id')
+        // .innerJoin('destinataire', 'chargement_camion.destinataire_id', '=', 'destinataire.id')
+        // .innerJoin('produit', 'chargement_camion.produit_id', '=', 'produit.id')
+        // .distinct()
+        // .select('numero_camion','camion_status').whereIn('numero_camion',newarray_camion)
+        // .andWhere({
+        //     'navire.nom':navire,
+        //     'importateur.nom':importateur,
+        //     'date_arrivee':datearrivee,
+        //     'destinataire.nom':destinataire,
+        //     'produit.nom':produit
+        // })
+        // .then(dataset=>{
+        //     if(dataset.length===0){
+        //         let newarray={}
+        //         newarray.numero_camion=dataset.map(elem=>elem.numero_camion);
+        //         newarray.camion_status='Pas encore commencé';
+        //         console.log('1 data dans chargement camion newarray',newarray)
+        //         res.json({newarray})
+        //     }else if(dataset.length==data.length){
+        //         dataset
+        //         console.log('2 data dans chargement camion newarray',dataset)
+        //         res.json({dataset})
+        //     }else{
+        //         let newarray=dataset.slice()
+        //         newarray.map(elem=>
+        //             {
+
+        //             })
+        //     }
+        //     console.log('2 data dans chargement camion newarray',data)
+        //     res.json({data})
+        //     console.log('3 data dans chargement camion',data)
+        // })
+        // .catch(err=>console.log("errrrroooooorr chargement camion"))
+        // res.json({data})
         res.json({data})
     })
     .catch(err=>console.log(err))

@@ -47,7 +47,7 @@ class AgentLogin extends Component {
                         <div className="field">
                             <label className="label">Password</label>
                             <div className="control">
-                                <input className="input" type="text" name="password" value={this.state.password} onChange={(e) => this.handleChange(e)} />
+                                <input className="input" type="password" name="password" value={this.state.password} onChange={(e) => this.handleChange(e)} />
                             </div>
                         </div>
                         <div className="field is-grouped is-grouped-centered">

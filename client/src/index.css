@@ -87,9 +87,27 @@ h1{
   font-size: 0.9em;
 }
 
-.table-bordered thead tr th{
+.ship-details-container-dataTable{
+  margin-top:3%;
+  /* width:50%; */
+  /* background-color: red; */
+  /* margin-left:5%; */
+  /* margin-right:20%; */
+  /* padding:5% */
+}
+
+.ship-details-container-dataTable .container{
+  width:80%;
+  justify-content: center;
+}
+/*************ALLL************/
+.table-bordered thead tr th,.table-bordered tbody tr td {
   text-align: center;
 }
+
+/* .table-bordered {
+  text-align: center;
+} */
 
 /********************************************CONTROL PORT****************************************/
 .dum-container {
@@ -113,7 +131,7 @@ h1{
 
 .dataTable-container, .destinataire-container{
   display: inline-flex;
-  margin-top:5%;
+  /* margin-top:5%; */
 }
 
 .dataTable-container .table-show .container{
@@ -159,10 +177,14 @@ h1{
 }
 
 .destinataire-container-global{
-  border:1px solid hsl(171, 100%, 41%);
+  /* border:1px solid hsl(171, 100%, 41%); */
   border-radius:5px;
   margin-top:2%;
   padding:1%;
+  background-color: hsl(170, 89%, 75%);
+}
+.paiment-container,.dataTable-second{
+  background-color: white;
 }
 .destinataire-container{
   width:100%;
@@ -181,6 +203,7 @@ h1{
   border-radius:5px;
   width:50%;
   margin:1%;
+  margin-top:0%
 }
 .paiment-container{
   /* border:1px solid hsl(171, 100%, 41%); */
@@ -194,9 +217,10 @@ h1{
   border:3px solid rgb(228, 224, 224);
 }
 
-.dataTable .col-xs-4 {
+/* .dataTable .col-xs-4 { */
+.col-xs-4 {
   /* display: inline-flex; */
-  margin-bottom: 10px;
+  margin-bottom: 4%;
 }
 
 .dataTable .col-xs-4 div:first-child{

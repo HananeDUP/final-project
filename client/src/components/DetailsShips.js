@@ -136,14 +136,14 @@ class DetailsShips extends Component {
 
                     </form>
                 </div>
-                <div>
+                <div className="ship-details-container-dataTable">
                     <div className='dataTable' >
                         {/* <div> */}
                         <NavireDataTable data={this.state.listNavireData} clickDetails={this.navireDetails.bind(this)}></NavireDataTable>
                     </div>
-                    <iframe title='control-port'>
+                    {/* <iframe title='control-port'>
                         {this.state.toggleClick ? <Link to='/control-port'></Link>: ""}
-                    </iframe>
+                    </iframe> */}
 
                 </div>
             </div>

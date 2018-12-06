@@ -57,10 +57,16 @@ class App extends Component {
     this.setState({dataLoad:data})
   }
 
-  getCurrentTruckData(data, resolve){
+  // getCurrentTruckData(data, resolve){
+  //   console.log('data for truck already load', data)
+  //   this.setState({dataTruckLoad:data}, _ => resolve())
+  // }
+
+  getCurrentTruckData(data){
     console.log('data for truck already load', data)
-    this.setState({dataTruckLoad:data}, _ => resolve())
+    this.setState({dataTruckLoad:data})
   }
+
   render() {
     if (this.state.isLoggedIn) {
       return (
@@ -82,8 +88,9 @@ class App extends Component {
             <Route exact path="/control-port" render={()=><ControlPort truckStartLoad={this.truckStartLoad.bind(this)}></ControlPort>}></Route>
             <Route exact path="/details-ship" component={DetailsShips}></Route>
             {/* <Route exact path="/truck-load" component={TruckLoad}></Route> */}
-            <Route exact path="/truck-load" render={()=><TruckLoad data={this.state.dataLoad} getCurrentTruckStatus={this.getCurrentTruckData.bind(this)}></TruckLoad>}></Route>
-            <Route exact path="/truck-load-resumee" render={()=><TruckLoadResumee dataTruck={this.state.dataTruckLoad} ></TruckLoadResumee>}></Route>
+            {/* getCurrentTruckStatus={this.getCurrentTruckData.bind(this)} */}
+            <Route exact path="/truck-load" render={()=><TruckLoad data={this.state.dataLoad} gettruckStartLoadResumee={this.getCurrentTruckData.bind(this)} ></TruckLoad>}></Route>
+            <Route exact path="/truck-load-resumee" render={()=><TruckLoadResumee data={this.state.dataLoad} ></TruckLoadResumee>}></Route>
             {/* <Route exact path="/react-table" component={ReactTableExample}></Route> */}
             <Route path="/" render={(props) => <Redirect to="/"></Redirect>}></Route>
           </Switch>
